@@ -13,22 +13,36 @@ class OrderController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'pickup_location' => 'required',
-            'destination' => 'required',
-        ]);
+{
+    $request->validate([
+        'pickup_location' => 'required',
+        'destination' => 'required',
+    ]);
 
-        Order::create([
-            'user_id' => auth()->id(),
-            'pickup_location' => $request->pickup_location,
-            'destination' => $request->destination,
-            'pickup_lat' => $request->pickup_lat,
-            'pickup_lng' => $request->pickup_lng,
-            'price' => 15000,
-            'status' => 'pending',
-        ]);
+    $destination = strtolower($request->destination);
 
-        return redirect()->route('history.index');
+    $price = 15000;
+
+    if ($destination == 'tangerang') {
+        $price = 15000;
+    } elseif ($destination == 'papua') {
+        $price = 500000;
+    } elseif ($destination == 'bandung') {
+        $price = 120000;
+    } elseif ($destination == 'bekasi') {
+        $price = 30000;
     }
+
+    Order::create([
+        'user_id' => auth()->id(),
+        'pickup_location' => $request->pickup_location,
+        'destination' => $request->destination,
+        'pickup_lat' => $request->pickup_lat,
+        'pickup_lng' => $request->pickup_lng,
+        'price' => $price,
+        'status' => 'pending',
+    ]);
+
+    return redirect()->route('history.index');
+}
 }
