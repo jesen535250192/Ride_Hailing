@@ -8,7 +8,7 @@ class HistoryController extends Controller
 {
     public function index()
     {
-        $orders = Order::where('user_id', 1)
+        $orders = Order::where('user_id', auth()->id())
             ->latest()
             ->get();
 
