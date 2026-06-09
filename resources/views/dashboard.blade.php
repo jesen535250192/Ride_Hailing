@@ -97,12 +97,12 @@
 
                     <h3>Driver Panel</h3>
 
-                    <p>Kelola order driver</p>
+                    <p>terima pesanan driver</p>
                 </div>
             </a>
             
             <a href="{{ route('driver.income') }}">
-    <button>Rekap Pendapatan Driver</button>
+    <button></button>
     <div style="
                     background: white;
                     padding: 25px;

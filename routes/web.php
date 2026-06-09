@@ -5,6 +5,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MessageController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -51,6 +52,18 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/driver/order/{id}/status/{status}', [OrderController::class, 'updateStatus'])
         ->name('driver.order.status');
+
+    Route::get('/orders/{order}/chat', [MessageController::class, 'index'])
+    ->middleware('auth')
+    ->name('chat.index');
+    Route::post('/orders/{order}/chat', [MessageController::class, 'store'])
+    ->middleware('auth')
+    ->name('chat.store');
+        
+
+
+
+
 });
 
 require __DIR__.'/auth.php';

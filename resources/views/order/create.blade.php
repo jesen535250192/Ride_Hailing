@@ -33,16 +33,6 @@
             z-index: 10;
         }
 
-        h2 {
-            margin-top: 0;
-        }
-
-        label {
-            font-weight: bold;
-            margin-top: 18px;
-            display: block;
-        }
-
         input {
             width: 100%;
             padding: 13px;
@@ -100,18 +90,21 @@
 
     <div class="form-box">
         <h2>Buat Order</h2>
-        <p>Klik map untuk pilih lokasi jemput dan tujuan.</p>
+        <p>Ketik lokasi atau klik map untuk pilih lokasi jemput dan tujuan.</p>
 
         <form action="{{ route('order.store') }}" method="POST">
             @csrf
 
             <input type="text" id="pickup_location" name="pickup_location" placeholder="Masukkan lokasi jemput" required>
+
             <input type="text" id="destination" name="destination" placeholder="Masukkan tujuan" required>
 
             <input type="hidden" id="pickup_lat" name="pickup_lat">
             <input type="hidden" id="pickup_lng" name="pickup_lng">
-            <input type="hidden" id="dest_lat" name="dest_lat">
-            <input type="hidden" id="dest_lng" name="dest_lng">
+
+            <input type="hidden" id="destination_lat" name="destination_lat">
+            <input type="hidden" id="destination_lng" name="destination_lng">
+
             <input type="hidden" id="distance" name="distance">
             <input type="hidden" id="price" name="price">
 
@@ -122,8 +115,17 @@
                 <div class="price">Rp <span id="priceText">0</span></div>
             </div>
 
-            <button type="button" onclick="getMyLocation()">Ambil Lokasi Saya</button>
-            <button type="submit">Pesan Sekarang</button>
+            <button type="button" onclick="searchLocationAndCalculate()">
+                Cari & Hitung Jarak
+            </button>
+
+            <button type="button" onclick="getMyLocation()">
+                Ambil Lokasi Saya
+            </button>
+
+            <button type="submit">
+                Pesan Sekarang
+            </button>
         </form>
     </div>
 
@@ -134,7 +136,6 @@
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
-
     let map = L.map('map').setView([-6.1754, 106.8272], 13);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -144,22 +145,18 @@
     let pickupMarker = null;
     let destMarker = null;
     let routeLine = null;
-
     let step = 1;
 
     const tariffPerKm = 10000;
 
-    map.on('click', async function(e)
-    {
+    map.on('click', async function(e) {
         let lat = e.latlng.lat;
         let lng = e.latlng.lng;
 
         let address = await getAddress(lat, lng);
 
-        if(step === 1)
-        {
-            if(pickupMarker)
-            {
+        if(step === 1) {
+            if(pickupMarker) {
                 map.removeLayer(pickupMarker);
             }
 
@@ -170,15 +167,11 @@
 
             document.getElementById('pickup_lat').value = lat;
             document.getElementById('pickup_lng').value = lng;
-
             document.getElementById('pickup_location').value = address;
 
             step = 2;
-        }
-        else
-        {
-            if(destMarker)
-            {
+        } else {
+            if(destMarker) {
                 map.removeLayer(destMarker);
             }
 
@@ -187,9 +180,8 @@
                 .bindPopup("Tujuan")
                 .openPopup();
 
-            document.getElementById('dest_lat').value = lat;
-            document.getElementById('dest_lng').value = lng;
-
+            document.getElementById('destination_lat').value = lat;
+            document.getElementById('destination_lng').value = lng;
             document.getElementById('destination').value = address;
 
             calculateDistance();
@@ -198,18 +190,15 @@
         }
     });
 
-    async function getAddress(lat, lng)
-    {
-        try
-        {
+    async function getAddress(lat, lng) {
+        try {
             let response = await fetch(
                 `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
             );
 
             let data = await response.json();
 
-            if(data.address)
-            {
+            if(data.address) {
                 return (
                     data.address.road ||
                     data.address.suburb ||
@@ -220,51 +209,99 @@
             }
 
             return data.display_name;
-        }
-        catch(error)
-        {
+        } catch(error) {
             return "Lokasi Tidak Diketahui";
         }
     }
 
-    function calculateDistance()
-    {
-        let pickupLat =
-            parseFloat(document.getElementById('pickup_lat').value);
+    async function searchCoordinate(address) {
+        let response = await fetch(
+            'https://nominatim.openstreetmap.org/search?format=json&q='
+            + encodeURIComponent(address)
+        );
 
-        let pickupLng =
-            parseFloat(document.getElementById('pickup_lng').value);
+        let data = await response.json();
 
-        let destLat =
-            parseFloat(document.getElementById('dest_lat').value);
+        if(data.length === 0) {
+            alert('Lokasi tidak ditemukan: ' + address);
+            return null;
+        }
 
-        let destLng =
-            parseFloat(document.getElementById('dest_lng').value);
+        return {
+            lat: parseFloat(data[0].lat),
+            lng: parseFloat(data[0].lon)
+        };
+    }
 
-        let distance =
-            getDistanceFromLatLonInKm(
-                pickupLat,
-                pickupLng,
-                destLat,
-                destLng
-            );
+    async function searchLocationAndCalculate() {
+        let pickupText = document.getElementById('pickup_location').value;
+        let destinationText = document.getElementById('destination').value;
+
+        if(!pickupText || !destinationText) {
+            alert('Isi lokasi jemput dan tujuan dulu');
+            return;
+        }
+
+        let pickupCoord = await searchCoordinate(pickupText);
+        let destCoord = await searchCoordinate(destinationText);
+
+        if(!pickupCoord || !destCoord) {
+            return;
+        }
+
+        document.getElementById('pickup_lat').value = pickupCoord.lat;
+        document.getElementById('pickup_lng').value = pickupCoord.lng;
+
+        document.getElementById('destination_lat').value = destCoord.lat;
+        document.getElementById('destination_lng').value = destCoord.lng;
+
+        if(pickupMarker) {
+            map.removeLayer(pickupMarker);
+        }
+
+        if(destMarker) {
+            map.removeLayer(destMarker);
+        }
+
+        pickupMarker = L.marker([pickupCoord.lat, pickupCoord.lng])
+            .addTo(map)
+            .bindPopup('Lokasi Jemput')
+            .openPopup();
+
+        destMarker = L.marker([destCoord.lat, destCoord.lng])
+            .addTo(map)
+            .bindPopup('Tujuan');
+
+        calculateDistance();
+    }
+
+    function calculateDistance() {
+        let pickupLat = parseFloat(document.getElementById('pickup_lat').value);
+        let pickupLng = parseFloat(document.getElementById('pickup_lng').value);
+
+        let destLat = parseFloat(document.getElementById('destination_lat').value);
+        let destLng = parseFloat(document.getElementById('destination_lng').value);
+
+        if(isNaN(pickupLat) || isNaN(pickupLng) || isNaN(destLat) || isNaN(destLng)) {
+            return;
+        }
+
+        let distance = getDistanceFromLatLonInKm(
+            pickupLat,
+            pickupLng,
+            destLat,
+            destLng
+        );
 
         let price = Math.ceil(distance * tariffPerKm);
 
-        document.getElementById('distance').value =
-            distance.toFixed(2);
+        document.getElementById('distance').value = distance.toFixed(2);
+        document.getElementById('price').value = price;
 
-        document.getElementById('price').value =
-            price;
+        document.getElementById('distanceText').innerText = distance.toFixed(2);
+        document.getElementById('priceText').innerText = price.toLocaleString('id-ID');
 
-        document.getElementById('distanceText').innerText =
-            distance.toFixed(2);
-
-        document.getElementById('priceText').innerText =
-            price.toLocaleString('id-ID');
-
-        if(routeLine)
-        {
+        if(routeLine) {
             map.removeLayer(routeLine);
         }
 
@@ -279,8 +316,7 @@
         map.fitBounds(routeLine.getBounds());
     }
 
-    function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2)
-    {
+    function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
         let R = 6371;
 
         let dLat = deg2rad(lat2 - lat1);
@@ -299,40 +335,56 @@
         return R * c;
     }
 
-    function deg2rad(deg)
-    {
+    function deg2rad(deg) {
         return deg * (Math.PI / 180);
     }
 
-    function getMyLocation()
-    {
-        navigator.geolocation.getCurrentPosition(async function(position)
-        {
+    function getMyLocation() {
+    if (!navigator.geolocation) {
+        alert("Browser tidak mendukung lokasi");
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        async function(position) {
             let lat = position.coords.latitude;
             let lng = position.coords.longitude;
+            let accuracy = position.coords.accuracy;
+
+            if (accuracy > 1000) {
+                alert("Lokasi kurang akurat. Coba aktifkan GPS / WiFi, atau pilih lokasi manual di map.");
+            }
 
             map.setView([lat, lng], 16);
 
             let address = await getAddress(lat, lng);
 
-            if(pickupMarker)
-            {
+            if (pickupMarker) {
                 map.removeLayer(pickupMarker);
             }
 
             pickupMarker = L.marker([lat, lng])
                 .addTo(map)
-                .bindPopup("Lokasi Saya")
+                .bindPopup("Lokasi Saya<br>Akurasi: " + Math.round(accuracy) + " meter")
                 .openPopup();
 
             document.getElementById('pickup_lat').value = lat;
             document.getElementById('pickup_lng').value = lng;
-
-            document.getElementById('pickup_location').value =
-                address;
+            document.getElementById('pickup_location').value = address;
 
             step = 2;
-        });
-    }
-
+        },
+        function(error) {
+            alert("Gagal mengambil lokasi. Izinkan akses lokasi di browser.");
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        }
+    );
+}
 </script>
+
+</body>
+</html>

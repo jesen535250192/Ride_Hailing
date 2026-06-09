@@ -92,6 +92,10 @@
             background:#00aa5b;
         }
 
+        .on_the_way{
+            background:#6f42c1;
+        }
+
         .completed{
             background:#007bff;
         }
@@ -107,6 +111,19 @@
             font-size:20px;
         }
 
+        .chat-btn{
+            background:#00aa5b;
+            color:white;
+            padding:10px 18px;
+            border-radius:10px;
+            text-decoration:none;
+            font-weight:bold;
+        }
+
+        .chat-btn:hover{
+            background:#00884a;
+        }
+
     </style>
 </head>
 
@@ -119,11 +136,13 @@
 <div class="container">
 
     <div class="top">
+
         <h2>Riwayat Perjalanan</h2>
 
         <a href="/dashboard" class="back-btn">
             ← Dashboard
         </a>
+
     </div>
 
     @forelse($orders as $order)
@@ -134,6 +153,7 @@
 
                 <div>
                     <div class="label">Order ID</div>
+
                     <div class="value">
                         #{{ $order->id }}
                     </div>
@@ -184,6 +204,15 @@
                         Rp {{ number_format($order->price,0,',','.') }}
                     </div>
                 </div>
+
+            </div>
+
+            <div style="margin-top:20px; display:flex; gap:10px;">
+
+                <a href="{{ route('chat.index', $order->id) }}"
+                   class="chat-btn">
+                    💬 Chat Driver
+                </a>
 
             </div>
 
