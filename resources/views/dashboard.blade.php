@@ -15,11 +15,9 @@
             background:#00aa5b;
             color:white;
             padding:18px 30px;
-
             display:flex;
             justify-content:space-between;
             align-items:center;
-
             font-size:24px;
             font-weight:bold;
         }
@@ -31,8 +29,51 @@
         }
 
         .user-name{
+            display:flex;
+            align-items:center;
+            gap:12px;
             font-size:16px;
             font-weight:bold;
+        }
+
+        .user-photo{
+            width:48px;
+            height:48px;
+            border-radius:50%;
+            object-fit:cover;
+            border:2px solid white;
+        }
+
+        .user-info{
+            display:flex;
+            flex-direction:column;
+        }
+
+        .user-role{
+            font-size:12px;
+            font-weight:normal;
+            opacity:.9;
+        }
+
+        .user-role{
+            display:block;
+            font-size:12px;
+            font-weight:normal;
+            opacity:.9;
+        }
+
+        .profile-btn{
+            background:white;
+            color:#00aa5b;
+            text-decoration:none;
+            padding:8px 16px;
+            border-radius:8px;
+            font-weight:bold;
+            transition:.3s;
+        }
+
+        .profile-btn:hover{
+            background:#f0f0f0;
         }
 
         .logout-btn{
@@ -48,6 +89,10 @@
 
         .logout-btn:hover{
             background:#f0f0f0;
+        }
+
+        .navbar-right form{
+            margin:0;
         }
 
         .container{
@@ -130,15 +175,55 @@
 
     <div class="navbar-right">
 
-        <span class="user-name">
-            👤 {{ auth()->user()->name }}
-        </span>
+        <div class="user-name">
+
+            @if(auth()->user()->profile_photo)
+
+                <img
+                    src="{{ asset('storage/'.auth()->user()->profile_photo) }}"
+                    class="user-photo">
+
+            @else
+
+                <img
+                    src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=00aa5b&color=ffffff&size=100"
+                    class="user-photo">
+
+            @endif
+
+            <div class="user-info">
+
+                <span>
+
+                    {{ auth()->user()->name }}
+
+                </span>
+
+                <span class="user-role">
+
+                    {{ ucfirst(auth()->user()->role) }}
+
+                </span>
+
+            </div>
+
+        </div>
+
+        <a href="{{ route('profile.edit') }}"
+           class="profile-btn">
+
+            Profile
+
+        </a>
 
         <form action="{{ route('logout') }}" method="POST">
+
             @csrf
 
             <button type="submit" class="logout-btn">
+
                 Logout
+
             </button>
 
         </form>
@@ -152,87 +237,102 @@
     <div class="welcome-card">
 
         <h1>
-            Halo, {{ auth()->user()->name }} 👋
+
+            Halo,
+
+            {{ auth()->user()->role == 'driver' ? 'Driver' : 'Customer' }}
+
+            {{ auth()->user()->name }} 👋
+
         </h1>
 
         <p>
-            Selamat datang di aplikasi Ride Hailing.
-            Silakan pilih menu di bawah untuk mulai menggunakan aplikasi.
+
+            @if(auth()->user()->role == 'customer')
+
+                Selamat datang di aplikasi Ride Hailing.
+                Silakan pesan perjalanan, lihat history, dan lakukan pembayaran.
+
+            @else
+
+                Selamat datang Driver.
+                Silakan ambil order yang tersedia dan kelola perjalanan Anda.
+
+            @endif
+
         </p>
 
     </div>
 
     <div class="menu-grid">
 
-        <a href="{{ route('order.create') }}" class="menu-card">
+        @if(auth()->user()->role == 'customer')
 
-            <div class="icon">
-                🚕
-            </div>
+            <a href="{{ route('order.create') }}" class="menu-card">
 
-            <h3>Pesan Ride</h3>
+                <div class="icon">🚕</div>
 
-            <p>
-                Buat order perjalanan baru.
-            </p>
+                <h3>Pesan Ride</h3>
 
-        </a>
+                <p>Buat order perjalanan baru.</p>
 
-        <a href="{{ route('history.index') }}" class="menu-card">
+            </a>
 
-            <div class="icon">
-                📜
-            </div>
+            <a href="{{ route('history.index') }}" class="menu-card">
 
-            <h3>History</h3>
+                <div class="icon">📜</div>
 
-            <p>
-                Lihat riwayat perjalanan.
-            </p>
+                <h3>History</h3>
 
-        </a>
+                <p>Lihat riwayat perjalanan.</p>
 
-        <a href="{{ route('payments.index') }}" class="menu-card">
+            </a>
 
-            <div class="icon">
-                💳
-            </div>
+            <a href="{{ route('payments.index') }}" class="menu-card">
 
-            <h3>Payment</h3>
+                <div class="icon">💳</div>
 
-            <p>
-                Lihat dan kelola pembayaran.
-            </p>
+                <h3>Payment</h3>
 
-        </a>
+                <p>Lihat riwayat pembayaran.</p>
 
-        <a href="/driver/orders" class="menu-card">
+            </a>
 
-            <div class="icon">
-                🛵
-            </div>
+        @endif
 
-            <h3>Driver Panel</h3>
+        @if(auth()->user()->role == 'driver')
 
-            <p>
-                Terima dan kelola pesanan driver.
-            </p>
+            <a href="{{ route('driver.orders') }}" class="menu-card">
 
-        </a>
+                <div class="icon">🛵</div>
 
-        <a href="{{ route('driver.income') }}" class="menu-card">
+                <h3>Order Masuk</h3>
 
-            <div class="icon">
-                💰
-            </div>
+                <p>Lihat order customer yang siap diambil.</p>
 
-            <h3>Driver Income</h3>
+            </a>
 
-            <p>
-                Lihat total pendapatan driver.
-            </p>
+            <a href="{{ route('driver.my.orders') }}" class="menu-card">
 
-        </a>
+                <div class="icon">📦</div>
+
+                <h3>Pesanan Saya</h3>
+
+                <p>Kelola perjalanan yang sedang Anda kerjakan.</p>
+
+            </a>
+
+            <a href="{{ route('driver.income') }}" class="menu-card">
+
+                <div class="icon">💰</div>
+
+                <h3>Pendapatan</h3>
+
+                <p>Lihat total pendapatan driver.</p>
+
+            </a>
+
+        @endif
 
     </div>
 

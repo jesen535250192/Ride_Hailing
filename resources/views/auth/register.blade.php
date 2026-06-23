@@ -1,49 +1,208 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register - Ride Hailing</title>
 
-        <div>
-            <x-input-label for="name" :value="'Name'" />
-            <x-text-input id="name" class="block mt-1 w-full"
-                type="text" name="name" required autofocus />
-        </div>
+    <style>
 
-        <div class="mt-4">
-            <x-input-label for="email" :value="'Email'" />
-            <x-text-input id="email" class="block mt-1 w-full"
-                type="email" name="email" required />
-        </div>
+        body{
+            margin:0;
+            font-family:Arial;
+            background:#f4f6f8;
+        }
 
-        <div class="mt-4">
-            <x-input-label for="role" :value="'Role'" />
-            <select id="role" name="role" required
-                class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
-                <option value="customer">Customer</option>
-                <option value="driver">Driver</option>
+        .navbar{
+            background:#00aa5b;
+            color:white;
+            padding:18px 30px;
+            font-size:24px;
+            font-weight:bold;
+            text-align:center;
+        }
+
+        .container{
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            min-height:90vh;
+        }
+
+        .card{
+            width:420px;
+            background:white;
+            padding:35px;
+            border-radius:18px;
+            box-shadow:0 5px 15px rgba(0,0,0,.08);
+        }
+
+        h2{
+            margin-top:0;
+            text-align:center;
+            color:#00aa5b;
+        }
+
+        label{
+            display:block;
+            margin-top:18px;
+            margin-bottom:8px;
+            font-weight:bold;
+        }
+
+        input,
+        select{
+            width:100%;
+            padding:12px;
+            border:1px solid #ccc;
+            border-radius:10px;
+            box-sizing:border-box;
+            font-size:15px;
+        }
+
+        button{
+            width:100%;
+            margin-top:25px;
+            padding:13px;
+            border:none;
+            border-radius:10px;
+            background:#00aa5b;
+            color:white;
+            font-size:16px;
+            font-weight:bold;
+            cursor:pointer;
+        }
+
+        button:hover{
+            background:#00884a;
+        }
+
+        .login-link{
+            text-align:center;
+            margin-top:20px;
+        }
+
+        .login-link a{
+            color:#00aa5b;
+            text-decoration:none;
+            font-weight:bold;
+        }
+
+        .error{
+            color:red;
+            font-size:14px;
+            margin-top:5px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="navbar">
+    🚖 Ride Hailing
+</div>
+
+<div class="container">
+
+    <div class="card">
+
+        <h2>Register</h2>
+
+        <form method="POST" action="{{ route('register') }}">
+
+            @csrf
+
+            <label>Nama</label>
+
+            <input
+                type="text"
+                name="name"
+                value="{{ old('name') }}"
+                required>
+
+            @error('name')
+                <div class="error">{{ $message }}</div>
+            @enderror
+
+
+            <label>Email</label>
+
+            <input
+                type="email"
+                name="email"
+                value="{{ old('email') }}"
+                required>
+
+            @error('email')
+                <div class="error">{{ $message }}</div>
+            @enderror
+
+
+            <label>Daftar Sebagai</label>
+
+            <select name="role" required>
+
+                <option value="">-- Pilih Role --</option>
+
+                <option value="customer"
+                    {{ old('role')=='customer'?'selected':'' }}>
+                    Customer
+                </option>
+
+                <option value="driver"
+                    {{ old('role')=='driver'?'selected':'' }}>
+                    Driver
+                </option>
+
             </select>
-        </div>
 
-        <div class="mt-4">
-            <x-input-label for="password" :value="'Password'" />
-            <x-text-input id="password" class="block mt-1 w-full"
-                type="password" name="password" required />
-        </div>
+            @error('role')
+                <div class="error">{{ $message }}</div>
+            @enderror
 
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="'Confirm Password'" />
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                type="password" name="password_confirmation" required />
-        </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900"
-                href="{{ route('login') }}">
-                Already registered?
+            <label>Password</label>
+
+            <input
+                type="password"
+                name="password"
+                required>
+
+            @error('password')
+                <div class="error">{{ $message }}</div>
+            @enderror
+
+
+            <label>Konfirmasi Password</label>
+
+            <input
+                type="password"
+                name="password_confirmation"
+                required>
+
+            <button type="submit">
+
+                Register
+
+            </button>
+
+        </form>
+
+        <div class="login-link">
+
+            Sudah punya akun?
+
+            <br><br>
+
+            <a href="{{ route('login') }}">
+                Login
             </a>
 
-            <x-primary-button class="ms-4">
-                Register
-            </x-primary-button>
         </div>
-    </form>
-</x-guest-layout>
+
+    </div>
+
+</div>
+
+</body>
+</html>

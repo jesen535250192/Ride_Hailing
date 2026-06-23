@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class DriverMiddleware
+class CustomerMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
@@ -14,8 +14,8 @@ class DriverMiddleware
             return redirect()->route('login');
         }
 
-        if (auth()->user()->role !== 'driver') {
-            abort(403, 'Halaman ini hanya dapat diakses oleh Driver.');
+        if (auth()->user()->role !== 'customer') {
+            abort(403, 'Halaman ini hanya dapat diakses oleh Customer.');
         }
 
         return $next($request);

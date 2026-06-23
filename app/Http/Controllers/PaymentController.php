@@ -10,7 +10,10 @@ class PaymentController extends Controller
 {
     public function index()
     {
-        $payments = Payment::with('order.user')
+        $payments = Payment::whereHas('order', function ($query) {
+        $query->where('user_id', auth()->id());
+            })
+            ->with('order.user')
             ->latest()
             ->get();
 
@@ -20,8 +23,8 @@ class PaymentController extends Controller
     public function create(Request $request)
     {
         $order = Order::with('payment', 'user')
+            ->where('user_id', auth()->id())
             ->findOrFail($request->order);
-
         if ($order->payment) {
             return redirect()
                 ->route('history.index')
@@ -38,7 +41,9 @@ class PaymentController extends Controller
             'payment_method' => 'required',
         ]);
 
-        $order = Order::with('payment')->findOrFail($request->order_id);
+        $order = Order::with('payment')
+            ->where('user_id', auth()->id())
+            ->findOrFail($request->order_id);
 
         // Cegah pembayaran ganda
         if ($order->payment) {
@@ -66,6 +71,10 @@ class PaymentController extends Controller
 
     public function show(Payment $payment)
     {
+        if ($payment->order->user_id != auth()->id()) {
+            abort(403);
+        }
+
         $payment->load('order.user');
 
         return view('payments.show', compact('payment'));

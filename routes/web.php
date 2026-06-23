@@ -4,19 +4,31 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\NotificationController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PaymentController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
+/*
+|--------------------------------------------------------------------------
+| Dashboard
+|--------------------------------------------------------------------------
+*/
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+/*
+|--------------------------------------------------------------------------
+| Route yang bisa diakses SEMUA USER yang sudah login
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth'])->group(function () {
 
     Route::get('/profile', [ProfileController::class, 'edit'])
         ->name('profile.edit');
@@ -26,6 +38,15 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('/profile', [ProfileController::class, 'destroy'])
         ->name('profile.destroy');
+});
+
+/*
+|--------------------------------------------------------------------------
+| CUSTOMER
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'customer'])->group(function () {
 
     Route::get('/order', [OrderController::class, 'create'])
         ->name('order.create');
@@ -36,11 +57,22 @@ Route::middleware('auth')->group(function () {
     Route::get('/history', [HistoryController::class, 'index'])
         ->name('history.index');
 
+    Route::resource('payments', PaymentController::class);
+
     Route::get('/notifications', [NotificationController::class, 'index'])
         ->name('notifications.index');
 
     Route::get('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])
         ->name('notifications.read');
+});
+
+/*
+|--------------------------------------------------------------------------
+| DRIVER
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'driver'])->group(function () {
 
     Route::get('/driver/orders', [OrderController::class, 'driverOrders'])
         ->name('driver.orders');
@@ -53,18 +85,25 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/driver/order/{id}/status/{status}', [OrderController::class, 'updateStatus'])
         ->name('driver.order.status');
+});
+
+/*
+|--------------------------------------------------------------------------
+| CHAT
+|--------------------------------------------------------------------------
+|
+| Chat digunakan oleh customer dan driver.
+| Validasi kepemilikan order akan kita lakukan di MessageController.
+|
+*/
+
+Route::middleware(['auth'])->group(function () {
 
     Route::get('/orders/{order}/chat', [MessageController::class, 'index'])
-    ->middleware('auth')
-    ->name('chat.index');
+        ->name('chat.index');
+
     Route::post('/orders/{order}/chat', [MessageController::class, 'store'])
-    ->middleware('auth')
-    ->name('chat.store');
-    Route::resource('payments', PaymentController::class);
-
-
-
-
+        ->name('chat.store');
 });
 
 require __DIR__.'/auth.php';
