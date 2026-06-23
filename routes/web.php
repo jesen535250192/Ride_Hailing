@@ -3,7 +3,6 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\HistoryController;
-use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RatingController;
@@ -37,7 +36,20 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])
         ->name('profile.update');
 
-    Route::delete('/profile', [ProfileController::class, 'destroy']);
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        ->name('profile.destroy');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Chat (Customer & Driver)
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/orders/{order}/chat', [MessageController::class, 'index'])
+        ->name('chat.index');
+
+    Route::post('/orders/{order}/chat', [MessageController::class, 'store'])
+        ->name('chat.store');
 });
 
 /*
@@ -64,18 +76,6 @@ Route::middleware(['auth', 'customer'])->group(function () {
     */
 
     Route::resource('payments', PaymentController::class);
-
-    /*
-    |--------------------------------------------------------------------------
-    | Notification
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get('/notifications', [NotificationController::class, 'index'])
-        ->name('notifications.index');
-
-    Route::get('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])
-        ->name('notifications.read');
 
     /*
     |--------------------------------------------------------------------------
@@ -112,7 +112,7 @@ Route::middleware(['auth', 'driver'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Driver Ratings
+    | Rating Driver
     |--------------------------------------------------------------------------
     */
 
@@ -120,23 +120,4 @@ Route::middleware(['auth', 'driver'])->group(function () {
         ->name('ratings.index');
 });
 
-/*
-|--------------------------------------------------------------------------
-| CHAT
-|--------------------------------------------------------------------------
-|
-| Chat digunakan oleh customer dan driver.
-| Validasi kepemilikan order akan kita lakukan di MessageController.
-|
-*/
-
-Route::middleware(['auth'])->group(function () {
-
-    Route::get('/orders/{order}/chat', [MessageController::class, 'index'])
-        ->name('chat.index');
-
-    Route::post('/orders/{order}/chat', [MessageController::class, 'store'])
-        ->name('chat.store');
-});
-
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
