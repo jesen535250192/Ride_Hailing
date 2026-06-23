@@ -81,7 +81,24 @@
                 </div>
             </a>
 
+            <!-- PAYMENT -->
+            <a href="{{ route('payments.index') }}"
+               style="text-decoration:none;">
 
+                <div style="
+                    background: white;
+                    padding: 25px;
+                    border-radius: 18px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+                    text-align:center;
+                ">
+                    <h2 style="font-size: 50px;">💳</h2>
+
+                    <h3>Payment</h3>
+
+                    <p>Lihat dan kelola pembayaran</p>
+                </div>
+            </a>
 
             <a href="/driver/orders"
                style="text-decoration:none;">
@@ -100,25 +117,25 @@
                     <p>terima pesanan driver</p>
                 </div>
             </a>
-            
-            <a href="{{ route('driver.income') }}">
-    <button></button>
-    <div style="
+
+            <a href="{{ route('driver.income') }}"
+               style="text-decoration:none;">
+
+                <div style="
                     background: white;
                     padding: 25px;
                     border-radius: 18px;
                     box-shadow: 0 5px 15px rgba(0,0,0,0.08);
                     text-align:center;
                 ">
-                    <h2 style="font-size: 50px;">🛵</h2>
+                    <h2 style="font-size: 50px;">💰</h2>
 
-                    <h3>Driver Panel</h3>
+                    <h3>Driver Income</h3>
 
-                    <p>Kelola order driver</p>
+                    <p>Kelola pendapatan driver</p>
                 </div>
-            
-</a>
-            
+
+            </a>
 
         </div>
 

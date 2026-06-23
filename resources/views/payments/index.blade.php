@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>History Order</title>
+    <title>Payment History</title>
 
     <style>
 
@@ -84,24 +84,12 @@
             font-weight:bold;
         }
 
-        .pending{
-            background:orange;
-        }
-
-        .accepted{
+        .paid{
             background:#00aa5b;
         }
 
-        .on_the_way{
-            background:#6f42c1;
-        }
-
-        .completed{
-            background:#007bff;
-        }
-
-        .cancelled{
-            background:red;
+        .pending{
+            background:orange;
         }
 
         .empty{
@@ -111,7 +99,7 @@
             font-size:20px;
         }
 
-        .chat-btn{
+        .detail-btn{
             background:#00aa5b;
             color:white;
             padding:10px 18px;
@@ -120,44 +108,25 @@
             font-weight:bold;
         }
 
-        .chat-btn:hover{
+        .detail-btn:hover{
             background:#00884a;
-        }
-        .pay-btn{
-            background:#007bff;
-            color:white;
-            padding:10px 18px;
-            border-radius:10px;
-            text-decoration:none;
-            font-weight:bold;
-        }
-
-        .pay-btn:hover{
-            background:#0056b3;
-        }
-
-        .paid-btn{
-            background:#28a745;
-            color:white;
-            padding:10px 18px;
-            border-radius:10px;
-            font-weight:bold;
         }
 
     </style>
+
 </head>
 
 <body>
 
 <div class="navbar">
-    History Order
+    Payment
 </div>
 
 <div class="container">
 
     <div class="top">
 
-        <h2>Riwayat Perjalanan</h2>
+        <h2>Riwayat Pembayaran</h2>
 
         <a href="/dashboard" class="back-btn">
             ← Dashboard
@@ -165,24 +134,58 @@
 
     </div>
 
-    @forelse($orders as $order)
+    @if(session('success'))
+
+        <div style="
+            background:#d4edda;
+            color:#155724;
+            padding:15px;
+            border-radius:10px;
+            margin-bottom:20px;
+        ">
+            {{ session('success') }}
+        </div>
+
+    @endif
+
+    @if(session('error'))
+
+        <div style="
+            background:#f8d7da;
+            color:#721c24;
+            padding:15px;
+            border-radius:10px;
+            margin-bottom:20px;
+        ">
+            {{ session('error') }}
+        </div>
+
+    @endif
+
+    @forelse($payments as $payment)
 
         <div class="card">
 
             <div style="display:flex;justify-content:space-between;align-items:center;">
 
                 <div>
-                    <div class="label">Order ID</div>
+
+                    <div class="label">
+                        Payment ID
+                    </div>
 
                     <div class="value">
-                        #{{ $order->id }}
+                        #{{ $payment->id }}
                     </div>
+
                 </div>
 
                 <div>
-                    <span class="status {{ $order->status }}">
-                        {{ strtoupper($order->status) }}
+
+                    <span class="status {{ strtolower($payment->status) }}">
+                        {{ strtoupper($payment->status) }}
                     </span>
+
                 </div>
 
             </div>
@@ -190,19 +193,35 @@
             <div class="route">
 
                 <div class="label">
-                    Lokasi Jemput
+                    Customer
                 </div>
 
                 <div class="value">
-                    {{ $order->pickup_location }}
+                    {{ $payment->order->user->name }}
                 </div>
 
                 <div class="label">
-                    Tujuan
+                    Pickup
                 </div>
 
                 <div class="value">
-                    {{ $order->destination }}
+                    {{ $payment->order->pickup_location }}
+                </div>
+
+                <div class="label">
+                    Destination
+                </div>
+
+                <div class="value">
+                    {{ $payment->order->destination }}
+                </div>
+
+                <div class="label">
+                    Payment Method
+                </div>
+
+                <div class="value">
+                    {{ $payment->payment_method }}
                 </div>
 
             </div>
@@ -210,44 +229,39 @@
             <div style="display:flex;justify-content:space-between;margin-top:20px;">
 
                 <div>
-                    <div class="label">Jarak</div>
+
+                    <div class="label">
+                        Transaction Date
+                    </div>
 
                     <div class="value">
-                        {{ $order->distance ?? 0 }} KM
+                        {{ \Carbon\Carbon::parse($payment->transaction_date)->format('d M Y H:i') }}
                     </div>
+
                 </div>
 
                 <div>
-                    <div class="label">Harga</div>
+
+                    <div class="label">
+                        Amount
+                    </div>
 
                     <div class="price">
-                        Rp {{ number_format($order->price,0,',','.') }}
+                        Rp {{ number_format($payment->amount,0,',','.') }}
                     </div>
+
                 </div>
 
             </div>
 
-           <div style="margin-top:20px; display:flex; gap:10px;">
+            <div style="margin-top:20px;">
 
-                <a href="{{ route('chat.index', $order->id) }}"
-                class="chat-btn">
-                    💬 Chat Driver
+                <a href="{{ route('payments.show',$payment->id) }}"
+                   class="detail-btn">
+
+                    📄 Detail
+
                 </a>
-
-                @if(!$order->payment)
-
-                    <a href="{{ route('payments.create', ['order' => $order->id]) }}"
-                    class="pay-btn">
-                        💳 Pay
-                    </a>
-
-                @else
-
-                    <span class="paid-btn">
-                        ✅ Paid
-                    </span>
-
-                @endif
 
             </div>
 
@@ -256,7 +270,9 @@
     @empty
 
         <div class="empty">
-            Belum ada history order
+
+            Belum ada pembayaran.
+
         </div>
 
     @endforelse

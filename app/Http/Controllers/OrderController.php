@@ -43,6 +43,9 @@ class OrderController extends Controller
         return redirect()->route('history.index');
     }
 
+    /**
+     * Daftar order yang belum diambil driver
+     */
     public function driverOrders()
     {
         $orders = Order::whereNull('driver_id')
@@ -53,20 +56,26 @@ class OrderController extends Controller
         return view('driver.orders', compact('orders'));
     }
 
+    /**
+     * Semua order milik driver
+     */
     public function myDriverOrders()
     {
         $orders = Order::where('driver_id', auth()->id())
-            ->whereIn('status', ['accepted', 'on_the_way'])
             ->latest()
             ->get();
 
         return view('driver.my-orders', compact('orders'));
     }
 
+    /**
+     * Update status perjalanan
+     */
     public function updateStatus($id, $status)
     {
         $order = Order::findOrFail($id);
 
+        // Driver pertama yang menerima order
         if ($status == 'accepted' && $order->driver_id == null) {
             $order->driver_id = auth()->id();
         }
@@ -74,9 +83,13 @@ class OrderController extends Controller
         $order->status = $status;
         $order->save();
 
-        return redirect()->route('driver.my.orders');
+        return redirect()->route('driver.my.orders')
+            ->with('success', 'Status order berhasil diperbarui.');
     }
 
+    /**
+     * Pendapatan driver
+     */
     public function driverIncome()
     {
         $orders = Order::where('driver_id', auth()->id())

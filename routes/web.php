@@ -6,6 +6,7 @@ use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\PaymentController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -59,7 +60,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/orders/{order}/chat', [MessageController::class, 'store'])
     ->middleware('auth')
     ->name('chat.store');
-        
+    Route::resource('payments', PaymentController::class);
 
 
 
