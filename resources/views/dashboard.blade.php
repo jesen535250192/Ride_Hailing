@@ -55,13 +55,6 @@
             opacity:.9;
         }
 
-        .user-role{
-            display:block;
-            font-size:12px;
-            font-weight:normal;
-            opacity:.9;
-        }
-
         .profile-btn{
             background:white;
             color:#00aa5b;
@@ -194,38 +187,26 @@
             <div class="user-info">
 
                 <span>
-
                     {{ auth()->user()->name }}
-
                 </span>
 
                 <span class="user-role">
-
                     {{ ucfirst(auth()->user()->role) }}
-
                 </span>
 
             </div>
 
         </div>
 
-        <a href="{{ route('profile.edit') }}"
-           class="profile-btn">
-
+        <a href="{{ route('profile.edit') }}" class="profile-btn">
             Profile
-
         </a>
 
         <form action="{{ route('logout') }}" method="POST">
-
             @csrf
-
             <button type="submit" class="logout-btn">
-
                 Logout
-
             </button>
-
         </form>
 
     </div>
@@ -300,6 +281,7 @@
 
         @endif
 
+
         @if(auth()->user()->role == 'driver')
 
             <a href="{{ route('driver.orders') }}" class="menu-card">
@@ -329,6 +311,17 @@
                 <h3>Pendapatan</h3>
 
                 <p>Lihat total pendapatan driver.</p>
+
+            </a>
+
+            <!-- MENU BARU -->
+            <a href="{{ route('ratings.index') }}" class="menu-card">
+
+                <div class="icon">⭐</div>
+
+                <h3>Rating Saya</h3>
+
+                <p>Lihat seluruh rating dan komentar dari customer.</p>
 
             </a>
 

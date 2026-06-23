@@ -123,6 +123,7 @@
         .chat-btn:hover{
             background:#00884a;
         }
+
         .pay-btn{
             background:#007bff;
             color:white;
@@ -138,6 +139,31 @@
 
         .paid-btn{
             background:#28a745;
+            color:white;
+            padding:10px 18px;
+            border-radius:10px;
+            font-weight:bold;
+        }
+
+        /* ==========================
+           Rating
+        ========================== */
+
+        .rating-btn{
+            background:#ffc107;
+            color:black;
+            padding:10px 18px;
+            border-radius:10px;
+            text-decoration:none;
+            font-weight:bold;
+        }
+
+        .rating-btn:hover{
+            background:#e0a800;
+        }
+
+        .rated-btn{
+            background:#17a2b8;
             color:white;
             padding:10px 18px;
             border-radius:10px;
@@ -213,7 +239,7 @@
                     <div class="label">Jarak</div>
 
                     <div class="value">
-                        {{ $order->distance ?? 0 }} KM
+                        {{ $order->distance ?? '-' }} KM
                     </div>
                 </div>
 
@@ -227,25 +253,55 @@
 
             </div>
 
-           <div style="margin-top:20px; display:flex; gap:10px;">
+            <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
 
+                {{-- CHAT --}}
                 <a href="{{ route('chat.index', $order->id) }}"
-                class="chat-btn">
+                    class="chat-btn">
                     💬 Chat Driver
                 </a>
 
+                {{-- PAYMENT --}}
                 @if(!$order->payment)
 
-                    <a href="{{ route('payments.create', ['order' => $order->id]) }}"
-                    class="pay-btn">
+                    <a href="{{ route('payments.create',['order'=>$order->id]) }}"
+                        class="pay-btn">
+
                         💳 Pay
+
                     </a>
 
                 @else
 
                     <span class="paid-btn">
+
                         ✅ Paid
+
                     </span>
+
+                @endif
+
+                {{-- RATING --}}
+                @if($order->status == 'completed')
+
+                    @if(!$order->rating)
+
+                        <a href="{{ route('ratings.create',$order->id) }}"
+                            class="rating-btn">
+
+                            ⭐ Beri Rating
+
+                        </a>
+
+                    @else
+
+                        <span class="rated-btn">
+
+                            ⭐ {{ $order->rating->rating }}/5
+
+                        </span>
+
+                    @endif
 
                 @endif
 
@@ -256,7 +312,9 @@
     @empty
 
         <div class="empty">
+
             Belum ada history order
+
         </div>
 
     @endforelse

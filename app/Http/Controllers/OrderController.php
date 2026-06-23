@@ -42,15 +42,13 @@ class OrderController extends Controller
             'pickup_lat' => $request->pickup_lat,
             'pickup_lng' => $request->pickup_lng,
 
-            'dest_lat' => $request->dest_lat,
-            'dest_lng' => $request->dest_lng,
+            'destination_lat' => $request->dest_lat,
+            'destination_lng' => $request->dest_lng,
 
-            'distance' => $distance,
             'price' => $price,
 
             'status' => 'pending',
         ]);
-
         return redirect()->route('history.index')
             ->with('success', 'Order berhasil dibuat.');
     }

@@ -6,6 +6,7 @@ use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\RatingController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -36,8 +37,7 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])
         ->name('profile.update');
 
-    Route::delete('/profile', [ProfileController::class, 'destroy'])
-        ->name('profile.destroy');
+    Route::delete('/profile', [ProfileController::class, 'destroy']);
 });
 
 /*
@@ -57,13 +57,37 @@ Route::middleware(['auth', 'customer'])->group(function () {
     Route::get('/history', [HistoryController::class, 'index'])
         ->name('history.index');
 
+    /*
+    |--------------------------------------------------------------------------
+    | Payment
+    |--------------------------------------------------------------------------
+    */
+
     Route::resource('payments', PaymentController::class);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Notification
+    |--------------------------------------------------------------------------
+    */
 
     Route::get('/notifications', [NotificationController::class, 'index'])
         ->name('notifications.index');
 
     Route::get('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])
         ->name('notifications.read');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Rating
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/ratings/{order}/create', [RatingController::class, 'create'])
+        ->name('ratings.create');
+
+    Route::post('/ratings/{order}', [RatingController::class, 'store'])
+        ->name('ratings.store');
 });
 
 /*
@@ -85,6 +109,15 @@ Route::middleware(['auth', 'driver'])->group(function () {
 
     Route::get('/driver/order/{id}/status/{status}', [OrderController::class, 'updateStatus'])
         ->name('driver.order.status');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Driver Ratings
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/driver/ratings', [RatingController::class, 'index'])
+        ->name('ratings.index');
 });
 
 /*

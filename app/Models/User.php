@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Models\Rating;
 
 class User extends Authenticatable
 {
@@ -74,5 +75,13 @@ class User extends Authenticatable
             Payment::class,
             Order::class
         );
+    }
+    public function receivedRatings()
+    {
+        return $this->hasMany(Rating::class, 'driver_id');
+    }
+    public function givenRatings()
+    {
+        return $this->hasMany(Rating::class, 'customer_id');
     }
 }
