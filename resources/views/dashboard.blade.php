@@ -1,143 +1,242 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 style="
-            font-size: 28px;
-            font-weight: bold;
-            color: #111827;
-        ">
-            🚖 Ride Hailing Dashboard
-        </h2>
-    </x-slot>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ride Hailing Dashboard</title>
 
-    <div style="
-        padding: 40px;
-        max-width: 1000px;
-        margin: auto;
-    ">
+    <style>
 
-        <div style="
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            padding: 30px;
-            border-radius: 20px;
-            color: white;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-        ">
-            <h1 style="
-                font-size: 32px;
-                margin-bottom: 10px;
-            ">
-                Halo, {{ auth()->user()->name }} 👋
-            </h1>
+        body{
+            margin:0;
+            font-family:Arial;
+            background:#f4f6f8;
+        }
 
-            <p style="
-                font-size: 18px;
-                opacity: 0.9;
-            ">
-                Selamat datang di aplikasi Ride Hailing
-            </p>
-        </div>
+        .navbar{
+            background:#00aa5b;
+            color:white;
+            padding:18px 30px;
 
-        <div style="
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-        ">
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
 
-            <a href="{{ route('order.create') }}"
-               style="text-decoration:none;">
+            font-size:24px;
+            font-weight:bold;
+        }
 
-                <div style="
-                    background: white;
-                    padding: 25px;
-                    border-radius: 18px;
-                    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-                    text-align:center;
-                    transition: 0.3s;
-                ">
-                    <h2 style="font-size: 50px;">🚕</h2>
+        .navbar-right{
+            display:flex;
+            align-items:center;
+            gap:15px;
+        }
 
-                    <h3>Pesan Ride</h3>
+        .user-name{
+            font-size:16px;
+            font-weight:bold;
+        }
 
-                    <p>Buat order perjalanan baru</p>
-                </div>
-            </a>
+        .logout-btn{
+            background:white;
+            color:#00aa5b;
+            border:none;
+            padding:8px 16px;
+            border-radius:8px;
+            cursor:pointer;
+            font-weight:bold;
+            transition:.3s;
+        }
 
-            <a href="{{ route('history.index') }}"
-               style="text-decoration:none;">
+        .logout-btn:hover{
+            background:#f0f0f0;
+        }
 
-                <div style="
-                    background: white;
-                    padding: 25px;
-                    border-radius: 18px;
-                    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-                    text-align:center;
-                ">
-                    <h2 style="font-size: 50px;">📜</h2>
+        .container{
+            max-width:1100px;
+            margin:auto;
+            padding:30px;
+        }
 
-                    <h3>History</h3>
+        .welcome-card{
+            background:white;
+            border-radius:18px;
+            padding:30px;
+            margin-bottom:30px;
+            box-shadow:0 5px 15px rgba(0,0,0,.08);
+            border-left:6px solid #00aa5b;
+        }
 
-                    <p>Lihat riwayat perjalanan</p>
-                </div>
-            </a>
+        .welcome-card h1{
+            margin:0;
+            font-size:32px;
+            color:#222;
+        }
 
-            <!-- PAYMENT -->
-            <a href="{{ route('payments.index') }}"
-               style="text-decoration:none;">
+        .welcome-card p{
+            margin-top:10px;
+            color:#666;
+            font-size:17px;
+        }
 
-                <div style="
-                    background: white;
-                    padding: 25px;
-                    border-radius: 18px;
-                    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-                    text-align:center;
-                ">
-                    <h2 style="font-size: 50px;">💳</h2>
+        .menu-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+            gap:20px;
+        }
 
-                    <h3>Payment</h3>
+        .menu-card{
+            background:white;
+            border-radius:18px;
+            padding:30px 20px;
+            text-align:center;
+            text-decoration:none;
+            color:#222;
+            box-shadow:0 5px 15px rgba(0,0,0,.08);
+            transition:.3s;
+        }
 
-                    <p>Lihat dan kelola pembayaran</p>
-                </div>
-            </a>
+        .menu-card:hover{
+            transform:translateY(-5px);
+            box-shadow:0 8px 20px rgba(0,0,0,.15);
+        }
 
-            <a href="/driver/orders"
-               style="text-decoration:none;">
+        .menu-card .icon{
+            font-size:55px;
+            margin-bottom:15px;
+        }
 
-                <div style="
-                    background: white;
-                    padding: 25px;
-                    border-radius: 18px;
-                    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-                    text-align:center;
-                ">
-                    <h2 style="font-size: 50px;">🛵</h2>
+        .menu-card h3{
+            margin:0;
+            color:#00aa5b;
+            font-size:22px;
+        }
 
-                    <h3>Driver Panel</h3>
+        .menu-card p{
+            margin-top:10px;
+            color:#666;
+            font-size:15px;
+        }
 
-                    <p>terima pesanan driver</p>
-                </div>
-            </a>
+    </style>
 
-            <a href="{{ route('driver.income') }}"
-               style="text-decoration:none;">
+</head>
 
-                <div style="
-                    background: white;
-                    padding: 25px;
-                    border-radius: 18px;
-                    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-                    text-align:center;
-                ">
-                    <h2 style="font-size: 50px;">💰</h2>
+<body>
 
-                    <h3>Driver Income</h3>
+<div class="navbar">
 
-                    <p>Kelola pendapatan driver</p>
-                </div>
+    <div>
+        🚖 Ride Hailing Dashboard
+    </div>
 
-            </a>
+    <div class="navbar-right">
 
-        </div>
+        <span class="user-name">
+            👤 {{ auth()->user()->name }}
+        </span>
+
+        <form action="{{ route('logout') }}" method="POST">
+            @csrf
+
+            <button type="submit" class="logout-btn">
+                Logout
+            </button>
+
+        </form>
 
     </div>
-</x-app-layout>
+
+</div>
+
+<div class="container">
+
+    <div class="welcome-card">
+
+        <h1>
+            Halo, {{ auth()->user()->name }} 👋
+        </h1>
+
+        <p>
+            Selamat datang di aplikasi Ride Hailing.
+            Silakan pilih menu di bawah untuk mulai menggunakan aplikasi.
+        </p>
+
+    </div>
+
+    <div class="menu-grid">
+
+        <a href="{{ route('order.create') }}" class="menu-card">
+
+            <div class="icon">
+                🚕
+            </div>
+
+            <h3>Pesan Ride</h3>
+
+            <p>
+                Buat order perjalanan baru.
+            </p>
+
+        </a>
+
+        <a href="{{ route('history.index') }}" class="menu-card">
+
+            <div class="icon">
+                📜
+            </div>
+
+            <h3>History</h3>
+
+            <p>
+                Lihat riwayat perjalanan.
+            </p>
+
+        </a>
+
+        <a href="{{ route('payments.index') }}" class="menu-card">
+
+            <div class="icon">
+                💳
+            </div>
+
+            <h3>Payment</h3>
+
+            <p>
+                Lihat dan kelola pembayaran.
+            </p>
+
+        </a>
+
+        <a href="/driver/orders" class="menu-card">
+
+            <div class="icon">
+                🛵
+            </div>
+
+            <h3>Driver Panel</h3>
+
+            <p>
+                Terima dan kelola pesanan driver.
+            </p>
+
+        </a>
+
+        <a href="{{ route('driver.income') }}" class="menu-card">
+
+            <div class="icon">
+                💰
+            </div>
+
+            <h3>Driver Income</h3>
+
+            <p>
+                Lihat total pendapatan driver.
+            </p>
+
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>
